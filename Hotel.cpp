@@ -8,7 +8,7 @@ using namespace std;
 bool Passwordverification(string password)
 {
 bool length;
-int Letters,Numbers,SpecialCharacters;
+int Letters=0,Numbers=0,SpecialCharacters=0;
 if(password.length() >= 8)
  length=true;
 for(int i=0;i<password.length();i++)
@@ -28,6 +28,7 @@ if(length==true && Letters > 0 && Numbers > 0 && SpecialCharacters > 0)
 }
 return false;
 }
+// function for Email format verification
 
 //creating Date structure
 struct Date{
@@ -82,7 +83,7 @@ if(answer == 'y'|| answer == 'Y')
    getline(cin,Lastname);
    f<<Lastname<<",";
 
-    cout<<"Enter a password(its length must be at least 8, while containing numbers, letters, and special characters('!','@','#','$'))"<<endl;
+    cout<<"Enter a password(its length must be at least 8, while containing numbers, letters, and special characters('!','@','#','$')):"<<endl;
    do
    {
     getline(cin,Password);
@@ -91,7 +92,11 @@ if(answer == 'y'|| answer == 'Y')
         cout<<"Password must contain:"<<endl;
         cout<<"1.At least 8 characters.\n 2.Numbers(0 --> 9),Letters(a --> z) and SpecialCharacters('!','@','#','$') \n";
     }while(Passwordverification(Password)==false);
-   f<<Password<<",";
+   f<<md5(Password)<<",";
+   cout<<"Enter an Email:"<<endl;
+   getline(cin,EmailAddress);
+
+
 
 
 
