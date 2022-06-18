@@ -2,6 +2,7 @@
 #include <fstream>
 #include <cstring>
 #include <string>
+#include "md5.h"
 using namespace std;
 // function for password verification
 bool Passwordverification(string password)
@@ -21,7 +22,7 @@ else
 if(password[i]>=33 && password[i]<=47 || password[i]>=58 && password[i]<=64 || password[i]>=91 && password[i]<=96||password[i]>=123 && password[i]<=126)
 SpecialCharacters++;
 }
-if(length==true && Letters>0 && Numbers>0 && SpecialCharacters>0)
+if(length==true && Letters > 0 && Numbers > 0 && SpecialCharacters > 0)
 {
     return true;
 }
@@ -82,8 +83,14 @@ if(answer == 'y'|| answer == 'Y')
    f<<Lastname<<",";
 
     cout<<"Enter a password(its length must be at least 8, while containing numbers, letters, and special characters('!','@','#','$'))"<<endl;
-   getline(cin,Password);
-
+   do
+   {
+    getline(cin,Password);
+    if(Passwordverification(Password)==false){
+        cout<<"Weak Password."<<endl;
+        cout<<"Password must contain:"<<endl;
+        cout<<"1.At least 8 characters.\n 2.Numbers(0 --> 9),Letters(a --> z) and SpecialCharacters('!','@','#','$') \n";
+    }while(Passwordverification(Password)==false);
    f<<Password<<",";
 
 
