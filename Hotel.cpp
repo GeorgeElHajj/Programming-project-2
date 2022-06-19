@@ -33,7 +33,7 @@ return false;
 bool Emailverification(string email)
 {
 int length=email.length();
-bool Exist=true; // to verify the '@' and '.' are in the email format
+bool Exist=true; // to verify that '@' and '.' are in the email format
 bool Position=true; // '@' should be before '.'
 bool Dotposition=true; // '.' should not be the last character
 int At=0,Dot=0;
@@ -54,6 +54,26 @@ if(Exist=true && Position=true && Dotposition==true)
 return true;
 else 
 return false;
+}
+bool PhoneNumberverification(string phonenumber)
+{
+    int length=phonenumber.length();
+    bool length9=true;
+    bool thirdchar=true;
+    int numbers=0;
+    if(length==9)
+    length9=true;
+    if(phonenumber[2]=='-')
+    thirdchar=true;
+    for(int i=0;i<length;i++)
+    {
+        if(phonenumber[i]>=48 && phonenumber[i]<=57)
+        numbers++;
+    }
+    if(length9=true && thirdchar=true && numbers==8)
+    return true;
+    else 
+    return false;
 }
 //creating Date structure
 struct Date{
