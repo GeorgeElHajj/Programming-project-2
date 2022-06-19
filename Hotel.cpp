@@ -2,6 +2,7 @@
 #include <fstream>
 #include <cstring>
 #include <string>
+#include <cstring>
 #include "md5.h"
 using namespace std;
 // function for password verification
@@ -29,7 +30,36 @@ if(length==true && Letters > 0 && Numbers > 0 && SpecialCharacters > 0)
 return false;
 }
 // function for Email format verification
+bool Emailverification(string email)
+{
+int length=email.length();
+bool Exist=true; // to verify the '@' and '.' are in the email format
+bool Position=true; // '@' should be before '.'
+bool Dotposition=true; // '.' should not be the last character
+int At=0,Dot=0;
+for(int i=0;i<length;i++)
+{
+    if(email[i]=='@')
+    At++;
+    if(email[i]=='.')
+    Dot++;
+}
+if(At==1 && Dot==1)
+Exist=true;
+if(email.find("@") < email.find("."))
+Position=true;
+if(email[length-1]=='.')
+Dotposition==false;
+if(Exist=true && Position=true && Dotposition==true)
+return true;
+else 
+return false;
 
+
+
+
+
+}
 //creating Date structure
 struct Date{
     int day;
@@ -69,7 +99,7 @@ if(answer != 'y'|| answer != 'Y'|| answer != 'N'|| answer != 'n')
 cout<<"Please answer correctly by 'y' or 'n'\n";
 }while(answer != 'y'|| answer != 'Y' || answer != 'N'|| answer != 'n' );
 
-if(answer == 'y'|| answer == 'Y')
+if(answer == 'y' || answer == 'Y')
 { 
   cout<<"Please fill the following questions:\n";
   cout<<"Your ID is:"<<Id<<endl;
