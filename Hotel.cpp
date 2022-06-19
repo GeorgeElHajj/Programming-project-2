@@ -145,7 +145,13 @@ if(answer == 'y' || answer == 'Y')
         cout<<"Invalid Email.Please verify the email format(ex:example123@gmail.com"<<endl;
    }while(Emailverification(EmailAddress)==false);
    f<<EmailAddress<<",";
-
+cout<<"Enter a Phone number(Format:00-000000):"<<endl;
+   do{
+   getline(cin,Phonenumber);
+    if(PhoneNumberverification(Phonenumber)==false)
+        cout<<"Invalid Phone number.Please verify the Phone number format(ex:00-000000"<<endl;
+   }while(PhoneNumberverification(Phonenumber)==false);
+   f<<Phonenumber<<",";
 
 
 
