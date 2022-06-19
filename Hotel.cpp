@@ -54,11 +54,6 @@ if(Exist=true && Position=true && Dotposition==true)
 return true;
 else 
 return false;
-
-
-
-
-
 }
 //creating Date structure
 struct Date{
@@ -120,12 +115,16 @@ if(answer == 'y' || answer == 'Y')
     if(Passwordverification(Password)==false){
         cout<<"Weak Password."<<endl;
         cout<<"Password must contain:"<<endl;
-        cout<<"1.At least 8 characters.\n 2.Numbers(0 --> 9),Letters(a --> z) and SpecialCharacters('!','@','#','$') \n";
+        cout<<"1.At least 8 characters.\n 2.Numbers(0-->9),Letters(a-->z or A-->Z) and SpecialCharacters('!','@','#','$',...) \n";
     }while(Passwordverification(Password)==false);
    f<<md5(Password)<<",";
    cout<<"Enter an Email:"<<endl;
+   do{
    getline(cin,EmailAddress);
-
+    if(Emailverification(EmailAddress)==false)
+        cout<<"Invalid Email.Please verify the email format(ex:example123@gmail.com"<<endl;
+   }while(Emailverification(EmailAddress)==false);
+   f<<EmailAddress<<",";
 
 
 
