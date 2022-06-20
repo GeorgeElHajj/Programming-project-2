@@ -140,6 +140,9 @@ void UserInfo(fstream& f)
     if (answer == 'y' || answer == 'Y')
     {
         cout << "Please fill the following questions:\n";
+         cout << "Your ID is:" << Id << endl;
+             f << Id<<",";
+             client.ID=Id;
 
         cout << "Enter the first name:" << endl;
         getline(cin, Firstname);
@@ -179,56 +182,35 @@ void UserInfo(fstream& f)
                 if (PhoneNumberverification(Phonenumber) == false)
                     cout << "Invalid Phone number.Please verify the Phone number format(ex:00-000000" << endl;
             } while (PhoneNumberverification(Phonenumber) == false);
-            f << Phonenumber << ",";
+            f << Phonenumber << "\n";
             client.tel=Phonenumber;
-             cout << "Your ID is:" << Id << endl;
-             f << Id << "\n";
-             client.ID=Id;
-
     }
     else
     {  
-       bool exist=true;
+      int c=0;
         cout<<"Enter your E-mail adress:\n";
             getline(cin,EmailAddress);
         cout<<"Enter your Password:\n";
             getline(cin,Password);
         while(f)
-        {
+        {   
+            f>>client.ID;
             getline(f,client.firstName,',');
             getline(f,client.lastName,',');
             getline(f,client.password,',');
             getline(f,client.address,',');
             getline(f,client.tel,',');
-            f>>client.ID;
-            if(client.address==EmailAddress && client.password==Password)
-                    exist=true;
-            else
-                    exist=false;
+            if( client.password==Password && client.address==EmailAddress )
+                    c=1;
         f.ignore();
         }
-        if(exist == true)
+        if(c==1)
             cout<<"Welcome Back!!!"<<endl;
         else
             cout<<"Invalid Email Or Password.\n Please try again.\n";
     
     }
 }
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
     int main()
     { 
         //creating csv files
@@ -243,7 +225,7 @@ void UserInfo(fstream& f)
 
 
 
-
+        
 
 
 
