@@ -179,7 +179,7 @@ void ClientInfo(fstream& f)
                 if (PhoneNumberverification(Phonenumber) == false)
                     cout << "Invalid Phone number.Please verify the Phone number format(ex:00-000000" << endl;
             } while (PhoneNumberverification(Phonenumber) == false);
-            f << Phonenumber << "\n";
+            f << Phonenumber << ",";
             client.tel=Phonenumber;
              cout << "Your ID is:" << Id << endl;
              f << Id << ",";
@@ -202,10 +202,9 @@ void ClientInfo(fstream& f)
             getline(f,client.tel,',');
             f>>client.ID;
             if(client.address==EmailAddress && client.password==Password)
-                {
                     exist=true;
-                    break;
-                }
+            else
+                    exist=false;
         f.ignore();
         }
         if(exist == true)
