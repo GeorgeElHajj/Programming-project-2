@@ -182,7 +182,7 @@ void ClientInfo(fstream& f)
             f << Phonenumber << ",";
             client.tel=Phonenumber;
              cout << "Your ID is:" << Id << endl;
-             f << Id << ",";
+             f << Id << "\n";
              client.ID=Id;
 
     }
