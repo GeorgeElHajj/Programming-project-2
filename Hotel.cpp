@@ -124,13 +124,13 @@ struct Client {
     Room *r;
 };
 //Client info
-void ClientInfo(fstream& f)
+void UserInfo(fstream& f)
 {
     string Firstname, Lastname, Password, EmailAddress, Phonenumber;
     char answer;
     Client client;
      int Id=1;
-    cout << "Are you a new Client (y/n):\n";
+    cout << "Are you a new User (y/n):\n";
     do {
         cin >> answer;
         if ( answer != 'y' && answer != 'Y' && answer != 'N' && answer != 'n')
@@ -187,7 +187,7 @@ void ClientInfo(fstream& f)
 
     }
     else
-    {
+    {  
        bool exist=true;
         cout<<"Enter your E-mail adress:\n";
             getline(cin,EmailAddress);
@@ -214,6 +214,21 @@ void ClientInfo(fstream& f)
     
     }
 }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
     int main()
     { 
         //creating csv files
@@ -223,7 +238,7 @@ void ClientInfo(fstream& f)
 
 
 
-        ClientInfo(Client);
+        UserInfo(Client);
 
 
 
