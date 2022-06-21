@@ -126,13 +126,38 @@ struct Client {
 };
 //Number of clients
 int NumofUsers(fstream &f){
-    int Num;
+    int Num=0;
     while(f)
     {
         Num++;
         f.ignore();
     }
     return Num;
+}
+//Copy file to client structure
+void Copy(fstream &f)
+{   string Firstname, Lastname, Password, EmailAddress, Phonenumber;
+        int ID;
+        int size=NumofUsers(f);
+        Client *client = new Client[size];
+        int i=0;
+while(f)
+{
+            f>>ID;
+            getline(f,Firstname,',');
+            getline(f,Lastname,',');
+            getline(f,Password,',');
+            getline(f,EmailAddress,',');
+            getline(f,Phonenumber,'\n');
+            client[i].ID=ID;
+            client[i].firstName=Firstname;
+            client[i].lastName=Lastname;
+            client[i].password=Password;
+            client[i].address=EmailAddress;
+            client[i].tel=Phonenumber;
+            i++;
+            f.ignore();
+}
 }
 //Client info
 void UserInfo(fstream& f)
@@ -195,29 +220,79 @@ void UserInfo(fstream& f)
             client.tel=Phonenumber;
 }
 //Log in
-void Login(fstream& f,string Email,string Pass)
+bool Login(fstream& f,string Email,string Pass)
 {       string Firstname, Lastname, Password, EmailAddress, Phonenumber;
         int ID;
-        int size=NumofUsers(f);
-        Client *p= new Client[size];
-          int c=0;
-        while(f)
-        {   
+        bool valid=true;
+    int size=NumofUsers(f);
+        Client *client = new Client[size];
+        int i=0;
+while(f)
+{
             f>>ID;
             getline(f,Firstname,',');
             getline(f,Lastname,',');
             getline(f,Password,',');
             getline(f,EmailAddress,',');
-            getline(f,Phonenumber,',');
-            client.ID=ID;
-            client.firstName=Firstname;
-            client.lastName=Lastname;
-            client.password=Password;
-            client.address=EmailAddress;
-            client.tel=Phonenumber;
-            if( client.password==Password && client.address==EmailAddress )
-                    c=1;
-        f.ignore();
+            getline(f,Phonenumber,'\n');
+            client[i].ID=ID;
+            client[i].firstName=Firstname;
+            client[i].lastName=Lastname;
+            client[i].password=Password;
+            client[i].address=EmailAddress;
+            client[i].tel=Phonenumber;
+            i++;
+            f.ignore();
+}
+for(int j=0;j<size;j++)
+{
+    if(client[j].password==Pass && client[j].address==Email)
+    {
+        valid=true;
+    }
+}
+if(valid==true)
+    return true;
+else 
+    return false;
+}
+//Administrator
+void Admin(fstream &f)
+{   char task;
+cout<<"Hello Admin:\n";
+cout<<"Pick the task you want to make:\n";
+cout<<"1.Add rooms\n2.Add rooms\n3.Modify the data of a room\n";
+do{
+    cin>>task;
+    if(task != '1' && task != '2' && task != '3')
+    cout<<"Please choose correctly the task you want to make\n";
+}while(task != '1' && task != '2' && task != '3');
+if(task == '1')
+{
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+}
+
+
+
+
+
+
+
+
 
 
 
@@ -226,7 +301,6 @@ void Login(fstream& f,string Email,string Pass)
 
 
 }
-  
     int main()
     {
         //creating csv files
@@ -236,7 +310,7 @@ void Login(fstream& f,string Email,string Pass)
         char answer;
         string Email,Pass;
         cout << "Are you a new User (y/n):\n";
-    do {
+        do {
         cin >> answer;
         if ( answer != 'y' && answer != 'Y' && answer != 'N' && answer != 'n')
             cout << "Please answer correctly by 'y' or 'n':\n";
@@ -247,40 +321,23 @@ void Login(fstream& f,string Email,string Pass)
     else
     {   
         cout<<"Log in :"<<endl;
+        do{
         cout<<"Enter your E-mail adress:\n";
             getline(cin,Email);
         cout<<"Enter your Password:\n";
             getline(cin,Pass);
-        Login(Client,Email, Pass);
-
+        if(Login(Client,Email, Pass)==false)
+        cout<<"Invalid Email Or password.\nTry again\n";
+    }while((Login(Client,Email, Pass)==false));
+    if(Login(Client,Email,Pass)==true)
+        cout<<"Welcome back!!!"<<endl;
     }
+        if(Email=="admin@gmail.com" && Pass=="admin-00")
+        {
 
-
+        }
 
         
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
