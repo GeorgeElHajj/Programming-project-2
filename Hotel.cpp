@@ -3,6 +3,7 @@
 #include <cstring>
 #include <string>
 #include <cstring>
+#include "sha1.hpp"
 using namespace std;
 // function for password verification
 bool Passwordverification(string password)
@@ -123,22 +124,23 @@ struct Client {
     string tel;
     Room *r;
 };
+//Number of clients
+int NumofUsers(fstream &f){
+    int Num;
+    while(f)
+    {
+        Num++;
+        f.ignore();
+    }
+    return Num;
+}
 //Client info
 void UserInfo(fstream& f)
 {
     string Firstname, Lastname, Password, EmailAddress, Phonenumber;
-    char answer;
+    int ID;
     Client client;
      int Id=1;
-    cout << "Are you a new User (y/n):\n";
-    do {
-        cin >> answer;
-        if ( answer != 'y' && answer != 'Y' && answer != 'N' && answer != 'n')
-            cout << "Please answer correctly by 'y' or 'n':\n";
-    } while (answer != 'y' && answer != 'Y' && answer != 'N' && answer != 'n');
-    cin.ignore();
-    if (answer == 'y' || answer == 'Y')
-    {
         cout << "Please fill the following questions:\n";
          cout << "Your ID is:" << Id << endl;
              f << Id<<",";
@@ -164,7 +166,14 @@ void UserInfo(fstream& f)
                 cout << "1.At least 8 characters.\n 2.Numbers(0-->9),Letters(a-->z or A-->Z) and SpecialCharacters('!','@','#','$',...) \n";
             }
             }while (Passwordverification(Password) == false);
-            f << Password << ",";
+            SHA1 checksum;
+            checksum.update(Password);
+            const string hash = checksum.final();
+
+
+
+            f << hash << ",";
+            
             client.password=Password;
 
             cout << "Enter an Email:" << endl;
@@ -184,44 +193,67 @@ void UserInfo(fstream& f)
             } while (PhoneNumberverification(Phonenumber) == false);
             f << Phonenumber << "\n";
             client.tel=Phonenumber;
-    }
-    else
-    {  
-      int c=0;
-        cout<<"Enter your E-mail adress:\n";
-            getline(cin,EmailAddress);
-        cout<<"Enter your Password:\n";
-            getline(cin,Password);
+}
+//Log in
+void Login(fstream& f,string Email,string Pass)
+{       string Firstname, Lastname, Password, EmailAddress, Phonenumber;
+        int ID;
+        int size=NumofUsers(f);
+        Client *p= new Client[size];
+          int c=0;
         while(f)
         {   
-            f>>client.ID;
-            getline(f,client.firstName,',');
-            getline(f,client.lastName,',');
-            getline(f,client.password,',');
-            getline(f,client.address,',');
-            getline(f,client.tel,',');
+            f>>ID;
+            getline(f,Firstname,',');
+            getline(f,Lastname,',');
+            getline(f,Password,',');
+            getline(f,EmailAddress,',');
+            getline(f,Phonenumber,',');
+            client.ID=ID;
+            client.firstName=Firstname;
+            client.lastName=Lastname;
+            client.password=Password;
+            client.address=EmailAddress;
+            client.tel=Phonenumber;
             if( client.password==Password && client.address==EmailAddress )
                     c=1;
         f.ignore();
-        }
-        if(c==1)
-            cout<<"Welcome Back!!!"<<endl;
-        else
-            cout<<"Invalid Email Or Password.\n Please try again.\n";
-    
-    }
+
+
+
+
+
+
+
 }
+  
     int main()
-    { 
+    {
         //creating csv files
         fstream  Room("Room.csv", ios::in | ios::out | ios::app);
         fstream Client("Client.csv", ios::in | ios::out | ios::app);
         fstream Reservation("Reservation.csv", ios::in | ios::out | ios::app);
+        char answer;
+        string Email,Pass;
+        cout << "Are you a new User (y/n):\n";
+    do {
+        cin >> answer;
+        if ( answer != 'y' && answer != 'Y' && answer != 'N' && answer != 'n')
+            cout << "Please answer correctly by 'y' or 'n':\n";
+         } while (answer != 'y' && answer != 'Y' && answer != 'N' && answer != 'n');
+    cin.ignore();
+    if (answer == 'y' || answer == 'Y')
+         UserInfo(Client);
+    else
+    {   
+        cout<<"Log in :"<<endl;
+        cout<<"Enter your E-mail adress:\n";
+            getline(cin,Email);
+        cout<<"Enter your Password:\n";
+            getline(cin,Pass);
+        Login(Client,Email, Pass);
 
-
-
-        UserInfo(Client);
-
+    }
 
 
 
