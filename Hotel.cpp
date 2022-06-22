@@ -134,31 +134,6 @@ int NumofUsers(fstream &f){
     }
     return Num;
 }
-//Copy file to client structure
-void Copy(fstream &f)
-{   string Firstname, Lastname, Password, EmailAddress, Phonenumber;
-        int ID;
-        int size=NumofUsers(f);
-        Client *client = new Client[size];
-        int i=0;
-while(f)
-{
-            f>>ID;
-            getline(f,Firstname,',');
-            getline(f,Lastname,',');
-            getline(f,Password,',');
-            getline(f,EmailAddress,',');
-            getline(f,Phonenumber,'\n');
-            client[i].ID=ID;
-            client[i].firstName=Firstname;
-            client[i].lastName=Lastname;
-            client[i].password=Password;
-            client[i].address=EmailAddress;
-            client[i].tel=Phonenumber;
-            i++;
-            f.ignore();
-}
-}
 //Client info
 void UserInfo(fstream& f)
 {
@@ -194,13 +169,8 @@ void UserInfo(fstream& f)
             SHA1 checksum;
             checksum.update(Password);
             const string hash = checksum.final();
-
-
-
             f << hash << ",";
-            
             client.password=Password;
-
             cout << "Enter an Email:" << endl;
             do {
                 getline(cin, EmailAddress);
@@ -218,6 +188,39 @@ void UserInfo(fstream& f)
             } while (PhoneNumberverification(Phonenumber) == false);
             f << Phonenumber << "\n";
             client.tel=Phonenumber;
+}
+//Copy file to client structure
+void Copy(fstream &f)
+{   string Firstname, Lastname, Password, EmailAddress, Phonenumber;
+        int ID;
+        int size=NumofUsers(f);
+        Client *client = new Client[size];
+        int i=0;
+while(f)
+{
+            f>>ID;
+            getline(f,Firstname,',');
+            getline(f,Lastname,',');
+            getline(f,Password,',');
+            getline(f,EmailAddress,',');
+            getline(f,Phonenumber,'\n');
+            client[i].ID=ID;
+            client[i].firstName=Firstname;
+            client[i].lastName=Lastname;
+            client[i].password=Password;
+            client[i].address=EmailAddress;
+            client[i].tel=Phonenumber;
+            i++;
+            f.ignore();
+}
+for(int i=0;i<size;i++)
+{
+        cout<< client[i].firstName<<endl;
+           cout<< client[i].lastName<<endl;
+           cout<< client[i].password<<endl;
+                cout<< client[i].address<<endl;
+          cout<<  client[i].tel<<endl;
+}
 }
 //Log in
 bool Login(fstream& f,string Email,string Pass)
@@ -245,7 +248,7 @@ while(f)
             f.ignore();
 }
 for(int j=0;j<size;j++)
-{
+{       
     if(client[j].password==Pass && client[j].address==Email)
     {
         valid=true;
@@ -256,9 +259,47 @@ if(valid==true)
 else 
     return false;
 }
+// Room check
+bool Roomcheck(fstream& f,int n)
+{
+    int size=NumofUsers(f);
+    Room *p= new Room[size];
+    int i=0;
+    bool exist=true;
+    int NUM;
+    string add,type;
+    while(f)
+    {
+        f>>NUM;
+        getline(f,add,',');
+        getline(f,type,'\n');
+        p[i].num=NUM;
+        p[i].address=add;
+        p[i].type=type;
+        i++;
+        f.ignore();
+    }
+        for(int j=0;j<size;j++)
+        {
+            if(p[j].num==n)
+           {
+             exist=true;
+            break;
+           }
+           else
+           exist=false;
+        }
+        if(exist=true)
+        return true;
+        else
+        return false;
+}
 //Administrator
 void Admin(fstream &f)
 {   char task;
+    int roomnum;
+    string address,type;
+    double price;
 cout<<"Hello Admin:\n";
 cout<<"Pick the task you want to make:\n";
 cout<<"1.Add rooms\n2.Add rooms\n3.Modify the data of a room\n";
@@ -268,38 +309,36 @@ do{
     cout<<"Please choose correctly the task you want to make\n";
 }while(task != '1' && task != '2' && task != '3');
 if(task == '1')
-{
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
+{ 
+    cout<<"Enter the Room number:\n";
+    do{
+    cin>>roomnum;
+    if(Roomcheck(f ,roomnum)==true)
+    cout<<"The room already exist.\nEnter another room number:\n";
+    }while(Roomcheck(f ,roomnum)==true);
+    f<<roomnum<<",";
+    cout<<"Enter the address of the room:\n";
+    getline(cin,address);
+    f<<address<<",";
+    cout<<"Enter the room type:\n";
+    getline(cin,type);
+    f<<type<<",";
+    cout<<"Enter the room price:\n";
+    cin>>price;
+    f<<price<<",";
+    char answer;
+    cout<<"Do you want to add additional features(ex:free Wifi-free cancellation)\n";
+    do {
+        cin >> answer;
+        if ( answer != 'y' && answer != 'Y' && answer != 'N' && answer != 'n')
+            cout << "Please answer correctly by 'y' or 'n':\n";
+         } while (answer != 'y' && answer != 'Y' && answer != 'N' && answer != 'n');
+    cin.ignore();
+    if (answer == 'y' || answer == 'Y')
+    {
+        
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
     int main()
     {
@@ -336,12 +375,5 @@ if(task == '1')
         {
 
         }
-
-        
-
-
-
-
-
-        return 0;
+     return 0;
     }
