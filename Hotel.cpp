@@ -12,6 +12,8 @@ bool Passwordverification(string password)
     int Letters = 0, Numbers = 0, SpecialCharacters = 0;
     if (password.length() >= 8)
         Length = true;
+        else
+        Length=false;
     for (int i = 0; i < password.length(); i++)
     {
         if (password[i] >= 65 && password[i] <= 90 || password[i] >= 97 && password[i] <= 122)
@@ -127,10 +129,18 @@ struct Client {
 //Number of clients
 int NumofUsers(fstream &f){
     int Num=0;
+    string Firstname, Lastname, Password, EmailAddress, Phonenumber;
+    int ID;
     while(f)
     {
-        Num++;
-        f.ignore();
+            f>>ID;
+            getline(f,Firstname,',');
+            getline(f,Lastname,',');
+            getline(f,Password,',');
+            getline(f,EmailAddress,',');
+            getline(f,Phonenumber,'\n');
+            f.ignore();
+            Num++;
     }
     return Num;
 }
@@ -199,6 +209,7 @@ void Copy(fstream &f)
 while(f)
 {
             f>>ID;
+            f.ignore();
             getline(f,Firstname,',');
             getline(f,Lastname,',');
             getline(f,Password,',');
@@ -346,10 +357,11 @@ if(task == '1')
     {
         //creating csv files
         fstream  Room("Room.csv", ios::in | ios::out | ios::app);
-        fstream Client("Client.csv", ios::in | ios::out | ios::app);
+        fstream Clients("Client.csv", ios::in | ios::out | ios::app);
         fstream Reservation("Reservation.csv", ios::in | ios::out | ios::app);
         char answer;
         string Email,Pass;
+        cout<<NumofUsers(Clients)<<endl;
         cout << "Are you a new User (y/n):\n";
         do {
         cin >> answer;
@@ -358,7 +370,8 @@ if(task == '1')
          } while (answer != 'y' && answer != 'Y' && answer != 'N' && answer != 'n');
     cin.ignore();
     if (answer == 'y' || answer == 'Y')
-         UserInfo(Client);
+     UserInfo(Clients);
+        
     else
     {   
         cout<<"Log in :"<<endl;
@@ -367,18 +380,15 @@ if(task == '1')
             getline(cin,Email);
         cout<<"Enter your Password:\n";
             getline(cin,Pass);
-        if(Login(Client,Email, Pass)==false)
+        if(Login(Clients,Email, Pass)==false)
         cout<<"Invalid Email Or password.\nTry again\n";
-    }while((Login(Client,Email, Pass)==false));
-    if(Login(Client,Email,Pass)==true)
+    }while((Login(Clients,Email, Pass)==false));
+    if(Login(Clients,Email,Pass)==true)
         cout<<"Welcome back!!!"<<endl;
     }
         if(Email=="admin@gmail.com" && Pass=="admin-00")
         {
 
         }
-        Client.close();
-        Room.close();
-        Reservation.close();
      return 0;
     }
