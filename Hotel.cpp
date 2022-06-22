@@ -335,8 +335,10 @@ if(task == '1')
          } while (answer != 'y' && answer != 'Y' && answer != 'N' && answer != 'n');
     cin.ignore();
     if (answer == 'y' || answer == 'Y')
-    {
-        
+    {   int features;
+        cout<<"Enter how many features you want to add:\n";
+        cin>>features;
+        string *f=new string[features];
     }
 }
 }
@@ -375,5 +377,8 @@ if(task == '1')
         {
 
         }
+        Client.close();
+        Room.close();
+        Reservation.close();
      return 0;
     }
