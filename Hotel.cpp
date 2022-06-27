@@ -8,6 +8,32 @@
 #include "sha1.hpp"
 //#include "aspose.cells.h";
 using namespace std;
+//creating Date structure
+struct Date {
+    int day;
+    int month;
+    int year;
+};
+//creating Room structure
+struct Room {
+    int num;
+    string address;
+    string type;
+    double price;
+    string* options;
+    Date start_date;
+    Date end_date;
+};
+//creating Client structure
+struct Client {
+    int ID;
+    string firstName;
+    string lastName;
+    string password;
+    string address;
+    string tel;
+    Room *r;
+};
 // function for password verification
 bool Passwordverification(string password)
 {
@@ -103,41 +129,15 @@ bool PhoneNumberverification(string phonenumber)
     else
         return false;
 }
-//creating Date structure
-struct Date {
-    int day;
-    int month;
-    int year;
-};
-//creating Room structure
-struct Room {
-    int num;
-    string address;
-    string type;
-    double price;
-    string* options;
-    Date start_date;
-    Date end_date;
-};
-//creating Client structure
-struct Client {
-    int ID;
-    string firstName;
-    string lastName;
-    string password;
-    string address;
-    string tel;
-    Room *r;
-};
 //ID Genreator
-int IdGenerator()
+int Id()
 {
     srand(time(0));
     int id = 1 + rand() % 1000;//generates number between 1 and 1000
     return id;
 }
 //ID check
-bool UniqueID(int id)
+bool SingleID(int id)
 {
     int check;
     int counter=0;
@@ -200,8 +200,8 @@ void UserInfo(fstream& f)
     int ID;
     Client client;
      do{
-         ID=IdGenerator();
-        }while(UniqueID(ID)==false);
+         ID=Id();
+        }while(SingleID(ID)==false);
         cout<< "Please fill the following questions:\n";
          cout << "Your ID is:" << ID << endl;
              f <<ID<<",";
@@ -250,41 +250,8 @@ void UserInfo(fstream& f)
             f << Phonenumber << "\n";
             client.tel=Phonenumber;
 }
-//Copy file to client structure
-void Copy(fstream &f,int n,string address)
-{ 
-       bool exist=true;
-   int size=NumofRooms(f);
-       Room *room = new Room[size];
-        int i=0;
-         ifstream file;
-    file.open("Room.csv");
-while(file.good())
-{
-            file>>room[i].num;
-            file.ignore();
-            getline(file,room[i].address,',');
-            getline(file,room[i].type,'\n');
-            file.ignore();
-            i++;
-}
-        for(int j=0;j<size;j++)
-        {
-            if(room[j].num==n && room[j].address==address)
-           {
-             exist=true;
-            break;
-           }
-           else
-           exist=false;
-        }
-        if(exist==true)
-        cout<<",";
-        else
-       cout<<";;;;";
-}
-//Log in
-bool Login(fstream& f,string Email,string Pass)
+//Sign in
+bool Signin(fstream& f,string Email,string Pass)
 { 
        int counter=0;
     int size=NumofUsers(f);
@@ -1053,7 +1020,7 @@ workbook->Save(outDir->StringAppend(new String("Sample1_out.pdf")), SaveFormat_P
             getline(cin,Email);
         cout<<"Enter your Password:\n";
             getline(cin,Pass);
-        if(Login(Clients,Email,Pass)==true)
+        if(Signin(Clients,Email,Pass)==true)
         cout<<"Welcome back!!!"<<endl;
        else
         cout<<"Invalid Email Or password.\nTry again\n";
