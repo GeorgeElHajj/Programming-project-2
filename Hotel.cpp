@@ -3,6 +3,8 @@
 #include <cstring>
 #include <string>
 #include <cstring>
+#include<cstdlib>
+#include<ctime>
 #include "sha1.hpp"
 using namespace std;
 // function for password verification
@@ -126,14 +128,43 @@ struct Client {
     string tel;
     Room *r;
 };
+//ID Genreator
+int IdGenerator()
+{
+    srand(time(0));
+    int id = 1 + rand() % 1000;//generates number between 1 and 1000
+    return id;
+}
+//ID check
+bool UniqueID(int id)
+{
+    int check;
+    int counter=0;
+    string s;
+    fstream f;
+    f.open("Client.csv",ios::in);
+    while (f)
+    {
+        f >> check;
+        f.ignore();
+        getline(f,s,'\n');
+    if (check == id)
+        counter++;
+    }
+    f.close();
+    if(counter==1)
+        return false;
+        else 
+        return true;
+}
 //Number of clients
 int NumofUsers(fstream &f){
-    int Num=0;
-    string Firstname, Lastname, Password, EmailAddress, Phonenumber;
+    int Num=-1;
     int ID;
+    string Firstname, Lastname, Password, EmailAddress, Phonenumber;
     while(f)
     {
-            f>>ID;
+        
             getline(f,Firstname,',');
             getline(f,Lastname,',');
             getline(f,Password,',');
@@ -142,7 +173,24 @@ int NumofUsers(fstream &f){
             f.ignore();
             Num++;
     }
+    f.close();
     return Num;
+}
+//Number of rooms
+int NumofRooms(fstream &f){
+int count=-1;
+int Numr;
+string add,type;
+
+while(f)
+{
+    getline(f,add,',');
+    getline(f,type,'\n');
+    f.ignore();
+    count++;
+}
+f.close();
+return count;
 }
 //Client info
 void UserInfo(fstream& f)
@@ -150,11 +198,13 @@ void UserInfo(fstream& f)
     string Firstname, Lastname, Password, EmailAddress, Phonenumber;
     int ID;
     Client client;
-     int Id=1;
-        cout << "Please fill the following questions:\n";
-         cout << "Your ID is:" << Id << endl;
-             f << Id<<",";
-             client.ID=Id;
+     do{
+         ID=IdGenerator();
+        }while(UniqueID(ID)==false);
+        cout<< "Please fill the following questions:\n";
+         cout << "Your ID is:" << ID << endl;
+             f <<1<<",";
+             client.ID=ID;
 
         cout << "Enter the first name:" << endl;
         getline(cin, Firstname);
@@ -200,99 +250,26 @@ void UserInfo(fstream& f)
             client.tel=Phonenumber;
 }
 //Copy file to client structure
-void Copy(fstream &f)
-{   string Firstname, Lastname, Password, EmailAddress, Phonenumber;
-        int ID;
-        int size=NumofUsers(f);
-        Client *client = new Client[size];
+void Copy(fstream &f,int n,string address)
+{ 
+       bool exist=true;
+   int size=NumofRooms(f);
+       Room *room = new Room[size];
         int i=0;
-while(f)
+         ifstream file;
+    file.open("Room.csv");
+while(file.good())
 {
-            f>>ID;
-            f.ignore();
-            getline(f,Firstname,',');
-            getline(f,Lastname,',');
-            getline(f,Password,',');
-            getline(f,EmailAddress,',');
-            getline(f,Phonenumber,'\n');
-            client[i].ID=ID;
-            client[i].firstName=Firstname;
-            client[i].lastName=Lastname;
-            client[i].password=Password;
-            client[i].address=EmailAddress;
-            client[i].tel=Phonenumber;
+            file>>room[i].num;
+            file.ignore();
+            getline(file,room[i].address,',');
+            getline(file,room[i].type,'\n');
+            file.ignore();
             i++;
-            f.ignore();
 }
-for(int i=0;i<size;i++)
-{
-        cout<< client[i].firstName<<endl;
-           cout<< client[i].lastName<<endl;
-           cout<< client[i].password<<endl;
-                cout<< client[i].address<<endl;
-          cout<<  client[i].tel<<endl;
-}
-}
-//Log in
-bool Login(fstream& f,string Email,string Pass)
-{       string Firstname, Lastname, Password, EmailAddress, Phonenumber;
-        int ID;
-        bool valid=true;
-    int size=NumofUsers(f);
-        Client *client = new Client[size];
-        int i=0;
-while(f)
-{
-            f>>ID;
-            getline(f,Firstname,',');
-            getline(f,Lastname,',');
-            getline(f,Password,',');
-            getline(f,EmailAddress,',');
-            getline(f,Phonenumber,'\n');
-            client[i].ID=ID;
-            client[i].firstName=Firstname;
-            client[i].lastName=Lastname;
-            client[i].password=Password;
-            client[i].address=EmailAddress;
-            client[i].tel=Phonenumber;
-            i++;
-            f.ignore();
-}
-for(int j=0;j<size;j++)
-{       
-    if(client[j].password==Pass && client[j].address==Email)
-    {
-        valid=true;
-    }
-}
-if(valid==true)
-    return true;
-else 
-    return false;
-}
-// Room check
-bool Roomcheck(fstream& f,int n)
-{
-    int size=NumofUsers(f);
-    Room *p= new Room[size];
-    int i=0;
-    bool exist=true;
-    int NUM;
-    string add,type;
-    while(f)
-    {
-        f>>NUM;
-        getline(f,add,',');
-        getline(f,type,'\n');
-        p[i].num=NUM;
-        p[i].address=add;
-        p[i].type=type;
-        i++;
-        f.ignore();
-    }
         for(int j=0;j<size;j++)
         {
-            if(p[j].num==n)
+            if(room[j].num==n && room[j].address==address)
            {
              exist=true;
             break;
@@ -300,69 +277,721 @@ bool Roomcheck(fstream& f,int n)
            else
            exist=false;
         }
-        if(exist=true)
+        if(exist==true)
+        cout<<",";
+        else
+       cout<<";;;;";
+}
+//Log in
+bool Login(fstream& f,string Email,string Pass)
+{ 
+       int counter=0;
+    int size=NumofUsers(f);
+        Client *client = new Client[size];
+        int i=0;
+     ifstream file;
+    file.open("Client.csv");
+while(file.good())
+{
+            file>> client[i].ID;
+            file.ignore();
+            getline(file,client[i].firstName,',');
+            getline(file,client[i].lastName,',');
+            getline(file,client[i].password,',');
+            getline(file,client[i].address,',');
+            getline(file,client[i].tel,'\n');
+            i++;
+}
+ SHA1 checksum;
+            checksum.update(Pass);
+            const string hash = checksum.final();
+for(int j=0;j<size;j++)
+{   
+    if( Email==client[j].address && hash==client[j].password)
+       counter++;
+}
+if(counter==1)
+    return true;
+else 
+    return false;
+}
+// Room check
+bool Roomcheck(fstream& f,int n,string address)
+{  bool exist=true;
+   int size=NumofRooms(f);
+       Room *room = new Room[size];
+        int i=0;
+         ifstream file;
+    file.open("Room.csv");
+while(file.good())
+{
+            file>>room[i].num;
+            file.ignore();
+            getline(file,room[i].address,',');
+            getline(file,room[i].type,'\n');
+            file.ignore();
+            i++;
+}
+file.close();
+        for(int j=0;j<size;j++)
+        {
+            if(room[j].num==n && room[j].address==address)
+           {
+             exist=true;
+            break;
+           }
+           else
+           exist=false;
+        }
+        if(exist==true)
         return true;
         else
         return false;
 }
-//Administrator
-void Admin(fstream &f)
-{   char task;
-    int roomnum;
-    string address,type;
-    double price;
-cout<<"Hello Admin:\n";
-cout<<"Pick the task you want to make:\n";
-cout<<"1.Add rooms\n2.Add rooms\n3.Modify the data of a room\n";
-do{
-    cin>>task;
-    if(task != '1' && task != '2' && task != '3')
-    cout<<"Please choose correctly the task you want to make\n";
-}while(task != '1' && task != '2' && task != '3');
-if(task == '1')
-{ 
-    cout<<"Enter the Room number:\n";
-    do{
-    cin>>roomnum;
-    if(Roomcheck(f ,roomnum)==true)
-    cout<<"The room already exist.\nEnter another room number:\n";
-    }while(Roomcheck(f ,roomnum)==true);
-    f<<roomnum<<",";
-    cout<<"Enter the address of the room:\n";
-    getline(cin,address);
-    f<<address<<",";
+//ADD Room
+void AddRoom(fstream &f)
+{   Room r;
+     cout<<"Enter the Room number and the address:\n";
+        cout<<"Room:\n";
+        cin>>r.num;
+        cin.ignore();
+        cout<<"Address:\n";
+        getline(cin,r.address);
+   if(Roomcheck(f ,r.num,r.address)==true)
+    {
+        cout<<"The room already exist.\nPlease try again\n";
+        return;
+    }
+    ofstream file;
+    file.open("Room.csv",ios::out|ios::app);
+     file<<r.num<<",";
+     file<<r.address<<",";
     cout<<"Enter the room type:\n";
-    getline(cin,type);
-    f<<type<<",";
+    getline(cin,r.type);
+    file<<r.type<<",";
     cout<<"Enter the room price:\n";
-    cin>>price;
-    f<<price<<",";
+    cin>>r.price;
     char answer;
-    cout<<"Do you want to add additional features(ex:free Wifi-free cancellation)\n";
+    cout<<"Do you want to add additional features(ex:free Wifi - free cancellation)(y/n):\n";
     do {
         cin >> answer;
         if ( answer != 'y' && answer != 'Y' && answer != 'N' && answer != 'n')
             cout << "Please answer correctly by 'y' or 'n':\n";
          } while (answer != 'y' && answer != 'Y' && answer != 'N' && answer != 'n');
     cin.ignore();
-    if (answer == 'y' || answer == 'Y')
-    {   int features;
+    if (answer == 'y' || answer == 'Y') 
+        { 
+        file<<r.price<<"$"<<",";
+        int features;
         cout<<"Enter how many features you want to add:\n";
         cin>>features;
-        string *f=new string[features];
+        cin.ignore();
+        r.options = new string[features];
+        for(int i=0;i<features-1;i++)
+        {
+            cout<<"feature "<<i+1<<endl;
+            getline(cin,r.options[i]);
+            file<<r.options[i]<<",";
+        }
+        cout<<"The last feature:\n";
+        getline(cin,r.options[features-1]);
+        file<<r.options[features-1]<<"\n";
+        }
+    else
+    {
+    file<<r.price<<"$"<<"\n";
+         file.close();
+    }
+    cout<<"Enter the starting date(day-month-year)\n";
+do{
+    cout<<"Day:"<<endl;
+    cin>>r.start_date.day;
+    if(r.start_date.day < 0 || r.start_date.day > 31 )
+    cout<<"Please enter a correct day.\n";
+}while(r.start_date.day < 0 || r.start_date.day > 31 );
+do{
+    cout<<"Month:"<<endl;
+    cin>>r.start_date.month;
+    if(r.start_date.month < 0 || r.start_date.month > 31 )
+    cout<<"Please enter a correct month.\n";
+}while(r.start_date.month < 0 || r.start_date.month > 12 );
+do{
+    cout<<"year:"<<endl;
+    cin>>r.start_date.year;
+    if(r.start_date.year >= 2022 )
+    cout<<"Please enter a correct year.\n";
+}while(r.start_date.year >= 2022 );
+cout<<"Enter the ending date(day-month-year)\n";
+do{
+    cout<<"Day:"<<endl;
+    cin>>r.end_date.day;
+    if(r.end_date.day < 0 || r.end_date.day > 31 )
+    cout<<"Please enter a correct day.\n";
+}while(r.end_date.day < 0 || r.end_date.day > 31 );
+do{
+    cout<<"Month:"<<endl;
+    cin>>r.start_date.month;
+    if(r.end_date.month < 0 || r.end_date.month > 31 )
+    cout<<"Please enter a correct month.\n";
+}while(r.end_date.month < 0 || r.end_date.month > 12 );
+do{
+    cout<<"year:"<<endl;
+    cin>>r.end_date.year;
+    if(r.end_date.year >= 2022 )
+    cout<<"Please enter a correct year.\n";
+}while(r.end_date.year >= 2022 );
+fstream check;
+check.open("info.csv",ios::out|ios :: app);
+check<<r.num<<","<<r.address<<","<<r.start_date.day<<","<<r.start_date.month<<","<<r.start_date.year<<","<<r.end_date.day<<","<<r.end_date.month<<","<<r.end_date.year<<"\n";
+check.close();
+}
+//Delete Room
+void DeleteRoom()
+{
+    fstream f;
+    fstream froom;
+    int number;
+    int numR;
+    string add;
+    string address,type;
+    double price;
+    string options;
+    cout<<"Enter the number of the room you want to delete:\n";
+    cin>>number;
+    cin.ignore();
+    cout<<"Enter the address of the room you want to delete:\n";
+    getline(cin,add);
+    f.open("Room.csv",ios::in);
+    froom.open("froom.csv",ios::out);
+    while(f)
+    {  
+         address=" ";
+         options=" ";
+        f>>numR;
+        f.ignore();
+        getline(f,address,',');
+        getline(f,type,',');
+        f>>price;
+        f.ignore();
+        getline(f,options,'\n');
+        if(numR ==number && address ==add)
+            continue;
+            else
+            froom<<numR<<","<<address<<","<<type<<","<<price<<"$"<<","<<options<<"\n";
+    }
+    f.close();
+    froom.close();
+    froom.open("froom.csv",ios::in);
+    f.open("Room.csv",ios::out|ios::app);
+    while(froom)
+    {
+         address=" "; 
+         options=" ";
+        froom>>numR;
+        froom.ignore();
+        getline(froom,address,',');
+        getline(froom,type,',');
+        froom>>price;
+        froom.ignore();
+        getline(froom,options,'\n');
+        if(address != " " && options != " ")
+            f<<numR<<","<<address<<","<<type<<","<<price<<"$"<<","<<options<<"\n";
+        else if(address != " " && options == " ")
+            f<<numR<<","<<address<<","<<type<<","<<price<<"$"<<"\n";
+    }
+    froom.close();
+    f.close();
+    remove("froom.csv");
+}
+//Modify Room
+void ModifyRoom()
+{
+    int number;
+    char choice;
+    string add;
+    fstream f,froom;
+    int numR;
+    string address,type;
+    double price;
+    string Options;
+     cout<<"Enter the number of the room you want to modify:\n";
+     cin>>number;
+     cin.ignore();
+     cout<<"Enter the address of the room you want to nodify:\n";
+     getline(cin,add);
+     cout<<"Choose the mofidification that you want:\n1.Price\n2.Options\n3.Both\n";
+         do{   cout<<"Choice:\n";
+            cin>>choice;
+            if(choice != '1' && choice != '2' && choice != '3')
+            cout<<"Please choose correctly the modification you want to make\n";
+          }while(choice != '1' && choice != '2' && choice != '3');
+    if( choice == '1')
+    {   int nprice;
+        cout<<"Enter the new price:\n";
+        cin>>nprice;
+        f.open("Room.csv",ios::in);
+        froom.open("froom.csv",ios::out);
+        while(f)
+    {   address=" ";
+        f>>numR;
+        f.ignore();
+        getline(f,address,',');
+        getline(f,type,',');
+        f>>price;
+        f.ignore();
+        getline(f,Options,'\n');
+        if(numR ==number && address ==add)
+           { froom<<numR<<","<<address<<","<<type<<","<<nprice<<"$"<<","<<Options<<"\n";
+           continue;
+           }
+            else if(address != " ")
+            froom<<numR<<","<<address<<","<<type<<","<<price<<"$"<<","<<Options<<"\n";
+    }
+    f.close();
+    froom.close();
+    froom.open("froom.csv",ios::in);
+    f.open("Room.csv",ios::out);
+    while(froom)
+    {
+         address=" "; 
+        froom>>numR;
+        froom.ignore();
+        getline(froom,address,',');
+        getline(froom,type,',');
+        froom>>price;
+        froom.ignore();
+        getline(froom,Options,'\n');
+        if(address != " " )
+            f<<numR<<","<<address<<","<<type<<","<<price<<"$"<<","<<Options<<"\n";
+    }
+    froom.close();
+    f.close();
+    remove("froom.csv");
+    }
+    else if( choice == '2')
+    {
+        int Opnum;
+        cout<<"You have to add the options(Old+New):\n";
+        cout<<"How many options do you want to add:\nIf you want to remove the options press 0.\n ";
+        cin>>Opnum;
+        cin.ignore();
+        string *Option = new string[Opnum];
+        string Opt;
+        for(int i=0;i<Opnum;i++)
+        {
+            cout<<"Enter option"<< i+1<<":\n";
+            getline(cin,Option[i]); 
+        }
+        for(int i=0;i<Opnum-1;i++)
+        {
+            Opt += (Option[i] + ",");
+        }
+        Opt += Option[Opnum-1];
+        f.open("Room.csv",ios::in);
+        froom.open("froom.csv",ios::out);
+        while(f)
+    {   address=" ";
+        f>>numR;
+        f.ignore();
+        getline(f,address,',');
+        getline(f,type,',');
+        f>>price;
+        f.ignore();
+        getline(f,Options,'\n');
+        if(numR ==number && address ==add)
+            {
+                if(Opt != " ")
+           froom<<numR<<","<<address<<","<<type<<","<<price<<"$"<<","<<Opt<<"\n";
+           else
+            froom<<numR<<","<<address<<","<<type<<","<<price<<"$"<<"\n";
+            }
+            else
+            froom<<numR<<","<<address<<","<<type<<","<<price<<"$"<<","<<Options<<"\n";
+    }
+    f.close();
+    froom.close();
+    froom.open("froom.csv",ios::in);
+    f.open("Room.csv",ios::out);
+    while(froom)
+    {
+         address=" "; 
+        froom>>numR;
+        froom.ignore();
+        getline(froom,address,',');
+        getline(froom,type,',');
+        froom>>price;
+        froom.ignore();
+        getline(froom,Options,'\n');
+        if(address != " " )
+            f<<numR<<","<<address<<","<<type<<","<<price<<"$"<<","<<Options<<"\n";
+    }
+    froom.close();
+    f.close();
+    remove("froom.csv");
+            }
+    else
+        {
+        int Nprice;
+        cout<<"Enter the new price:\n";
+        cin>> Nprice;
+        cin.ignore();
+        int Opnum;
+        cout<<"You have to add the options(Old+New):\n";
+        cout<<"How many options do you want to add:\nIf you want to remove the options press 0.\n ";
+        cin>>Opnum;
+        cin.ignore();
+        string *Option = new string[Opnum];
+        string Opt;
+        for(int i=0;i<Opnum;i++)
+        {
+            cout<<"Enter option"<< i+1<<":\n";
+            getline(cin,Option[i]); 
+        }
+        for(int i=0;i<Opnum-1;i++)
+        {
+            Opt += (Option[i] + ",");
+        }
+        Opt += Option[Opnum-1];
+        f.open("Room.csv",ios::in);
+        froom.open("froom.csv",ios::out);
+        while(f)
+    {   address=" ";
+        f>>numR;
+        f.ignore();
+        getline(f,address,',');
+        getline(f,type,',');
+        f>>price;
+        f.ignore();
+        getline(f,Options,'\n');
+        if(numR ==number && address ==add)
+            {
+                if(Opt != " ")
+           froom<<numR<<","<<address<<","<<type<<","<<Nprice<<"$"<<","<<Opt<<"\n";
+           else
+            froom<<numR<<","<<address<<","<<type<<","<<Nprice<<"$"<<"\n";
+            }
+            else
+            froom<<numR<<","<<address<<","<<type<<","<<price<<"$"<<","<<Options<<"\n";
+    }
+    f.close();
+    froom.close();
+    froom.open("froom.csv",ios::in);
+    f.open("Room.csv",ios::out);
+    while(froom)
+    {
+         address=" "; 
+        froom>>numR;
+        froom.ignore();
+        getline(froom,address,',');
+        getline(froom,type,',');
+        froom>>price;
+        froom.ignore();
+        getline(froom,Options,'\n');
+        if(address != " " )
+            f<<numR<<","<<address<<","<<type<<","<<price<<"$"<<","<<Options<<"\n";
+    }
+    froom.close();
+    f.close();
+    remove("froom.csv");
+        }
+}
+//Administrator
+void Admin(fstream &f)
+{   char task;
+        cout<<"Hello Admin:\n";
+        cout<<"Pick the task you want to make:\n";
+        cout<<"1.Add rooms.\n2.Delete rooms.\n3.Modify the data of a room.\n";
+        do{ cout<<"Task:\n";
+            cin>>task;
+            if(task != '1' && task != '2' && task != '3')
+            cout<<"Please choose correctly the task you want to make\n";
+          }while(task != '1' && task != '2' && task != '3');
+            if(task == '1')
+                AddRoom(f);
+            else if(task == '2')
+                DeleteRoom();
+            else   
+                ModifyRoom();
+
+}
+//Room Reservation
+void RoomReservation(string firstname,string lastname)
+{  
+    Date start,end;
+    int Rnum;
+    string address;
+    int sday,smonth,syear,eday,emonth,eyear;
+    cout<<"Welcome to the Reservation page:\n ";
+do{
+    cout<<"Day:"<<endl;
+    cin>>start.day;
+    if(start.day < 0 || start.day > 31 )
+    cout<<"Please enter a correct day.\n";
+}while(start.day < 0 || start.day > 31 );
+do{
+    cout<<"Month:"<<endl;
+    cin>>start.month;
+    if(start.month < 0 || start.month > 31 )
+    cout<<"Please enter a correct month.\n";
+}while(start.month < 0 || start.month > 12 );
+do{
+    cout<<"year:"<<endl;
+    cin>>start.year;
+    if(start.year >= 2022 )
+    cout<<"Please enter a correct year.\n";
+}while(start.year >= 2022 );
+cout<<"Enter the ending date(day-month-year)\n";
+do{
+    cout<<"Day:"<<endl;
+    cin>>end.day;
+    if(end.day < 0 || end.day > 31 )
+    cout<<"Please enter a correct day.\n";
+}while(end.day < 0 || end.day > 31 );
+do{
+    cout<<"Month:"<<endl;
+    cin>>end.month;
+    if(end.month < 0 || end.month > 31 )
+    cout<<"Please enter a correct month.\n";
+}while(end.month < 0 || end.month > 12 );
+do{
+    cout<<"year:"<<endl;
+    cin>>end.year;
+    if(end.year >= 2022 )
+    cout<<"Please enter a correct year.\n";
+}while(end.year >= 2022 );
+fstream check;
+check.open("info.csv",ios::in);
+int size=NumofRooms(check);
+int *room = new int[size];
+int i=0;
+while(check)
+{
+    check>>Rnum;
+    check.ignore();
+    getline(check,address,',');
+    check>>sday;
+    check>>smonth;
+    check>>syear;
+    check>>eday;
+    check>>emonth;
+    check>>eyear;
+    check.ignore();
+    if(start.day >= sday && start.month >= smonth && start.year >= syear && end.day <=eday && end.month <= emonth && end.year <= eyear )
+        {
+            room[i]=Rnum;
+            i++;
+        }
+}
+check.close();
+int numR;
+    string add;
+    string ADDRESS,type;
+    double price;
+    string options;
+cout<<"The rooms You can reserve are:\n";
+fstream f;
+f.open("Room.csv",ios::in);
+for(int j=0;j<size;j++)
+{
+    while(f)
+    {
+        address=" ";
+         options=" ";
+        f>>numR;
+        f.ignore();
+        getline(f,ADDRESS,',');
+        getline(f,type,',');
+        f>>price;
+        f.ignore();
+        getline(f,options,'\n');
+        if(numR==room[j])
+        cout<<numR<<"\t"<<address<<"\t"<<type<<"\t"<<price<<"$\t"<<options<<"\n";
+        else
+        continue;
     }
 }
+    f.close();
+    int num;
+    cout<<"How many rooms you want to reserve:\n";
+    cin>>num;
+    cin.ignore();
+    int *Roomnum = new int[num];
+    for(int i=0;i<num;i++)
+    {
+        cout<<"Enter tne number of the room "<<i+1<<" :";
+        cin>>Roomnum[i];
+    }
+    int numRoom;
+    string Address,Type;
+    double Price;
+    string Options;
+    fstream Reservation;
+    Reservation.open("Reservation.csv",ios::out|ios::app);
+    f.open("Room.csv",ios::in);
+    for(int j=0;j<num;j++)
+    {
+    while(f)
+    {
+         Address=" ";
+         Options=" ";
+        f>>numRoom;
+        f.ignore();
+        getline(f,Address,',');
+        getline(f,Type,',');
+        f>>Price;
+        f.ignore();
+         getline(f,Options,'\n');
+        if(numRoom==Roomnum[j])
+        Reservation<<numR<<","<<firstname<<","<<lastname<<","<<start.day<<"-"<<start.month<<"-"<<start.year<<","<<end.day<<"-"<<end.month<<"-"<<end.year<<"\n";
+    }
+    }
+    f.close();
+    Reservation.close();
+}
+//Cancellation
+void Cancellation(string first,string last)
+{   int Rnum;
+    char answer;
+    cout<<"Please enter the number of the room you want to cancel it's reservation:\n";
+    cin>>Rnum;
+    cin.ignore();
+cout<<"Does your room come with additional options (y/n):\n";
+ do {
+        cin >> answer;
+        if ( answer != 'y' && answer != 'Y' && answer != 'N' && answer != 'n')
+            cout << "Please answer correctly by 'y' or 'n':\n";
+    } while (answer != 'y' && answer != 'Y' && answer != 'N' && answer != 'n');
+cin.ignore();
+    if (answer == 'y' || answer == 'Y')
+    {   int features;
+        int counter=0;
+        cout<<"How many features:\n";
+        cin>>features;
+        string *Features= new string[features];
+        for(int i=0;i<features;i++)
+        {
+            cout<<"Enter feature "<<i+1<<" :\n";
+            getline(cin,Features[i]);
+            if(Features[i]=="free cancellation"||Features[i]=="Free cancellation")
+            counter++;
+        }
+        if(counter==1)
+        {cout<<"Your cancellation is done.No additional fees.\n";
+        fstream reserv;
+        reserv.open("Reservation.csv",ios::in);
+        fstream temp;
+        temp.open("temp.csv", ios::out);
+        int num;
+        string fn,ln;
+        string start;
+        string end;
+        while (reserv)
+        {
+        fn = " ";
+        ln = " ";
+        reserv >> num;
+        reserv.ignore();
+        getline(reserv, fn, ',');
+        getline(reserv, ln, ',');
+        getline(reserv, start, ',');
+        getline(reserv,end,'\n');
+        if (Rnum == num && fn == first && ln == last)
+            continue;
+        else
+            temp<< num << "," << fn << "," << ln << "," << start<<","<< end << "\n";
+        }
+        reserv.close();
+        temp.close();
+        temp.open("temp.csv", ios::in);
+        reserv.open("Reservation.csv", ios::out|ios::app);
+
+         while (temp)
+        {
+        fn = " ";
+        ln = " ";
+        temp >> num;
+        temp.ignore();
+        getline(temp, fn, ',');
+        getline(temp, ln, ',');
+        getline(temp,first, ',');
+        getline(temp,last,'\n');
+        if (fn != " " )
+        reserv<< num << "," << fn << "," << ln << "," <<start<<","<< end << "\n";
+        }
+        temp.close();
+        reserv.close();
+        remove("temp.csv");
+    }
+    else
+    cout<<"You can not cancel your reservation.\n";
+    }
+    else
+    cout<<"You can not cancel your reservation.\n";
+}
+//PDF
+void PDF(string first,string last)
+{
+    fstream file,froom;
+    file.open("Reservations.csv",ios::in|ios::out|ios::app);
+    int num;
+    string fname,lname,start,end;
+    int *roomnum = new int[NumofRooms(file)];
+    int i=0;
+    while(file)
+    {
+        fname=" ";
+        file>>num;
+        file.ignore();
+        getline(file,fname,',');
+        getline(file,lname,',');
+        getline(file,start,',');
+        getline(file,end,'\n');
+        file.ignore();
+        if(fname==first && lname==last)
+        {
+            roomnum[i]=num;
+            i++;
+        }
+    }
+    file.close();
+        froom.open("Room.csv",ios::in|ios::out|ios::app);
+int numR;
+    string add;
+    string address,type;
+    double price;
+    string options;
+    double *Price = new double[i];
+    for(int j=0;j<i;j++)
+    {
+    while(froom)
+    {  
+         address=" ";
+         options=" ";
+         froom>>numR;
+        froom.ignore();
+        getline(froom,address,',');
+        getline(froom,type,',');
+        froom>>price;
+        froom.ignore();
+        getline(froom,options,'\n');
+        if(roomnum[j]==numR)
+      Price[j]=price; 
+    }
+    }
+    double sum=0;
+    froom.close();
+    fstream PDF;
 }
     int main()
     {
         //creating csv files
-        fstream  Room("Room.csv", ios::in | ios::out | ios::app);
-        fstream Clients("Client.csv", ios::in | ios::out | ios::app);
-        fstream Reservation("Reservation.csv", ios::in | ios::out | ios::app);
+        fstream Clients("Client.csv", ios:: in | ios::out | ios::app);
+        fstream  Room("Room.csv", ios:: in | ios::out | ios::app);
+        fstream Reservation("Reservation.csv", ios:: in | ios::out | ios::app);
         char answer;
         string Email,Pass;
-        cout<<NumofUsers(Clients)<<endl;
-        cout << "Are you a new User (y/n):\n";
+        string first,last;
+       cout << "Are you a new User (y/n):\n";
         do {
         cin >> answer;
         if ( answer != 'y' && answer != 'Y' && answer != 'N' && answer != 'n')
@@ -371,24 +1000,54 @@ if(task == '1')
     cin.ignore();
     if (answer == 'y' || answer == 'Y')
      UserInfo(Clients);
-        
     else
     {   
-        cout<<"Log in :"<<endl;
-        do{
-        cout<<"Enter your E-mail adress:\n";
+        cout<<"Sign in :"<<endl;
+         cout<<"Enter your E-mail adress:\n";
             getline(cin,Email);
         cout<<"Enter your Password:\n";
             getline(cin,Pass);
-        if(Login(Clients,Email, Pass)==false)
-        cout<<"Invalid Email Or password.\nTry again\n";
-    }while((Login(Clients,Email, Pass)==false));
-    if(Login(Clients,Email,Pass)==true)
+        if(Login(Clients,Email,Pass)==true)
         cout<<"Welcome back!!!"<<endl;
-    }
-        if(Email=="admin@gmail.com" && Pass=="admin-00")
-        {
+       else
+        cout<<"Invalid Email Or password.\nTry again\n";
 
+    }
+   
+      if(Email=="admin@gmail.com")
+        {
+            Admin(Room);
+        }
+        else
+        {   char Option;
+            cout<<"Hello Client:\n";
+            cout<<"Choose what option you want:\n";
+            cout<<"1.Make a Reservation.\n2.Cancel a Reservation.";
+            do{ 
+                cout<<"Option:\n";
+                cin>>Option;
+                cin.ignore();
+            if(Option != '1' && Option != '2' )
+            cout<<"Please choose correctly the Option. \n";
+             }while(Option != '1' && Option != '2' );
+                if(Option == '1'){
+                    cout<<"Enter your first name:\n";
+                getline(cin,first);
+                cout<<"Enter your last name:\n";
+                getline(cin,last);
+                RoomReservation(first,last);
+                }
+                else
+                {
+                    cout<<"Enter your first name:\n";
+                    getline(cin,first);
+                    cout<<"Enter your last name:\n";
+                    getline(cin,last);
+                    Cancellation(first,last);
+                }
+        Clients.close();
+        Room.close();
+        Reservation.close();
         }
      return 0;
     }
