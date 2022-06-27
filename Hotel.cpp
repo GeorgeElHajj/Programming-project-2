@@ -7,7 +7,6 @@
 #include<ctime>
 #include "sha1.hpp"
 //#include "aspose.cells.h";
-
 using namespace std;
 // function for password verification
 bool Passwordverification(string password)
@@ -1013,8 +1012,22 @@ int numR;
     Invoice<<"Bill without tax:"<<","<<sum<<"$"<<"\n";
     Invoice<<"Bill with tax(11%):"<<","<<totalbill<<"$"<<"\n";
     Invoice.close();
-}
+ /*   // Source directory path.
+StringPtr srcDir = new String("SourceDirectory\\");
 
+// Output directory path.
+StringPtr outDir = new String("OutputDirectory\\");
+
+// Create CSV LoadOptions object
+intrusive_ptr<ILoadOptions> loadOptions = Factory::CreateILoadOptions(LoadFormat_CSV);
+
+// Load the input Excel file
+intrusive_ptr<IWorkbook> workbook = Factory::CreateIWorkbook(srcDir->StringAppend(new String("Sample1.csv")), loadOptions);
+
+// Save as PDF file
+workbook->Save(outDir->StringAppend(new String("Sample1_out.pdf")), SaveFormat_Pdf);
+}*/
+}
     int main()
     {
         //creating csv files
