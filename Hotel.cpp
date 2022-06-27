@@ -203,7 +203,7 @@ void UserInfo(fstream& f)
         }while(UniqueID(ID)==false);
         cout<< "Please fill the following questions:\n";
          cout << "Your ID is:" << ID << endl;
-             f <<1<<",";
+             f <<ID<<",";
              client.ID=ID;
 
         cout << "Enter the first name:" << endl;
@@ -1013,7 +1013,6 @@ int numR;
         cout<<"Invalid Email Or password.\nTry again\n";
 
     }
-   
       if(Email=="admin@gmail.com")
         {
             Admin(Room);
