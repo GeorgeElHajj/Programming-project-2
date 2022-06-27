@@ -6,6 +6,8 @@
 #include<cstdlib>
 #include<ctime>
 #include "sha1.hpp"
+//#include "aspose.cells.h";
+
 using namespace std;
 // function for password verification
 bool Passwordverification(string password)
@@ -978,10 +980,41 @@ int numR;
       Price[j]=price; 
     }
     }
-    double sum=0;
     froom.close();
-    fstream PDF;
+    double sum=0;
+    double totalbill=0;
+    for(int k=0;k<i;k++)
+    {
+        sum+=Price[k];
+    }
+    totalbill=sum+(sum*0.11);
+    //Sort price
+    for(int a=0;a<i;a++)
+    {
+        for(int b=a+1;b<i;b++)
+        {
+            if(Price[a]> Price[b])
+            {
+                double  PRICE = Price[a];
+                Price[a]= Price[b];
+                Price[b]= PRICE;
+                int room=roomnum[a];
+                roomnum[a]=roomnum[b];
+                roomnum[b]=room;
+            }
+        }
+    }
+    fstream Invoice;
+    Invoice.open("Invoice.csv",ios::in|ios::out|ios::app);
+    for(int k=0;k<i;k++)
+    {
+        Invoice<<roomnum[k]<<","<<first<<","<<last<<","<<Price[k]<<"$"<<"\n";
+    }
+    Invoice<<"Bill without tax:"<<","<<sum<<"$"<<"\n";
+    Invoice<<"Bill with tax(11%):"<<","<<totalbill<<"$"<<"\n";
+    Invoice.close();
 }
+
     int main()
     {
         //creating csv files
