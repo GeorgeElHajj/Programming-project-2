@@ -738,9 +738,9 @@ do{
 do{
     cout<<"year:"<<endl;
     cin>>start.year;
-    if(start.year >= 2022 )
+    if(start.year < 2022 )
     cout<<"Please enter a correct year.\n";
-}while(start.year >= 2022 );
+}while(start.year < 2022 );
 cout<<"Enter the ending date(day-month-year)\n";
 do{
     cout<<"Day:"<<endl;
@@ -757,9 +757,9 @@ do{
 do{
     cout<<"year:"<<endl;
     cin>>end.year;
-    if(end.year >= 2022 )
+    if(end.year < 2022 )
     cout<<"Please enter a correct year.\n";
-}while(end.year >= 2022 );
+}while(end.year < 2022 );
 fstream check;
 check.open("info.csv",ios::in);
 int size=NumofRooms(check);
